@@ -23,15 +23,13 @@ app.message('hello', async ({ message, say }) => {
   await say(`Hey there <@${message.user}>!`);
 });
 
+// Listens to incoming messages that contain "goodbye"
+app.message('goodbye', async ({ message, say }) => {
+  // say() sends a message to the channel where the event was triggered
+  await say(`See ya later, <@${message.user}>! :wave:`);
+});
+
 // Handle the Lambda function event
 module.exports.handler = serverlessExpress({
   app: expressReceiver.app
 });
-
-
-// (async () => {
-//   // Start your app
-//   await app.start(process.env.PORT || 3000);
-
-//   console.log('⚡️ Bolt app is running!');
-// })();

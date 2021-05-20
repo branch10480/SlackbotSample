@@ -246,4 +246,7 @@ dist/
 tmp/
 temp/
 
+# direnv
+.envrc
+
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,intellij+all

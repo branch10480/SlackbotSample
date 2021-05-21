@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@octokit/rest": "^18.5.3",
     "@slack/bolt": "^3.3.0",
     "@vendia/serverless-express": "^4.3.7",
     "jslint": "^0.12.1"

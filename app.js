@@ -1,5 +1,6 @@
 const { App, ExpressReceiver } = require('@slack/bolt');
 const serverlessExpress = require('@vendia/serverless-express');
+const { Octokit } = require("@octokit/rest");
 
 // カスタムのレシーバーを初期化します
 const expressReceiver = new ExpressReceiver({
@@ -11,10 +12,15 @@ const expressReceiver = new ExpressReceiver({
   processBeforeResponse: true
 });
 
-// ボットトークンと、AWS Lambda に対応させたレシーバーを使ってアプリを初期化します。
+// ボットトークンと、AWS Lambda に対応させたレシーバーを使ってアプリを初期化
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   receiver: expressReceiver
+});
+
+// GitHub Octkit
+const octokit = new Octokit({
+  auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
 });
 
 // Listens to incoming messages that contain "hello"
@@ -27,6 +33,19 @@ app.message('hello', async ({ message, say }) => {
 app.message('goodbye', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
   await say(`See ya later, <@${message.user}>! :wave:`);
+});
+
+// Listens to incoming messages that contain "myRepos"
+app.message('myRepos', async ({ message, say }) => {
+  // GitHub REST API にアクセスする
+  await say('OK, just a minute!');
+  await octokit.rest.repos.listForAuthenticatedUser().then(response => {
+    const status = response.status;
+    const dataArray = response.data;
+    dataArray.forEach(data => {
+      console.log(data.full_name);
+    });
+  });
 });
 
 // Handle the Lambda function event

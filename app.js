@@ -39,16 +39,15 @@ app.message('goodbye', async ({ message, say }) => {
 app.message('myRepos', async ({ message, say }) => {
   // GitHub REST API にアクセスする
   await say('OK, just a minute!');
-  await octokit.rest.repos.listForAuthenticatedUser().then(response => {
+  await octokit.rest.repos.listForAuthenticatedUser().then(async response => {
     const status = response.status;
     const dataArray = response.data;
     let text = "";
     dataArray.forEach(data => {
       text += data.full_name + '\n';
     });
-    say(text);
-    say('Completed!');
-    console.log('Completed!')
+    await say(text);
+    await say('Completed!');
   });
 });
 

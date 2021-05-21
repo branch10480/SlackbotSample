@@ -42,9 +42,13 @@ app.message('myRepos', async ({ message, say }) => {
   await octokit.rest.repos.listForAuthenticatedUser().then(response => {
     const status = response.status;
     const dataArray = response.data;
+    let text = "";
     dataArray.forEach(data => {
-      console.log(data.full_name);
+      text += data.full_name + '\n';
     });
+    say(text);
+    say('Completed!');
+    console.log('Completed!')
   });
 });
 

@@ -249,4 +249,7 @@ temp/
 # direnv
 .envrc
 
+# Constants
+github_const.js
+
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,intellij+all

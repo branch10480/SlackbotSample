@@ -1,0 +1,11 @@
+const masterBranches = [
+  '',
+];
+const owner = 'Owner name';
+const repo = 'Repository name';
+
+exports = {
+  masterBranches: masterBranches,
+  owner: owner,
+  repo: repo,
+};

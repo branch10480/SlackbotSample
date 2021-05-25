@@ -170,34 +170,69 @@ async function getMyRepos() {
   return text;
 }
 
+// develop -> [targets] のPRを作成する
 async function createPRDevelopIntoMasters() {
   const head = 'develop';
   let succeededs = [];
   let faileds = [];
+  let createdPRs = [];
   for (const i in masterBranches) {
+    const title = `【Auto】${head} => ${masterBranches[i]}`;
     try {
       const {data, status} = await octokit.rest.pulls.create({
         owner,
         repo,
+        title,
         head,
         base: masterBranches[i]
       });
-      console.log(data);
-      succeededs.push(`${head} => ${masterBranches[i]}`);
+      createdPRs.push(data);
+      succeededs.push(title);
     } 
     catch(e) {
-      const messages = e.errors.map((error) => { return error.message });
-      const message = `${head} => ${masterBranches[i]} | ` + messages;
-      faileds.push(message);
+      console.log(e);
+      faileds.push(String(e));
     }
   }
 
-  let message = '== Succeeded ==\n';
+  let message = '== Create PRs ==\n';
+  message += '-- Succeeded --\n';
   message += succeededs.join('\n');
-  message += '== Failed ==\n';
+  message += '-- Failed --\n';
   message += faileds.join('\n');
+  message += '\n\n';
 
+  message += await mergePRs(createdPRs);
+  
   console.log(message);
+  return message;
+}
+
+// 対象のPRをマージする
+async function mergePRs(prDataList) {
+  let message = '== Merge PRs ==\n';
+  let succeededs = [];
+  let faileds = [];
+  for (const i in prDataList) {
+    const data = prDataList[i];
+    try {
+      await octokit.pulls.merge({
+        owner,
+        repo,
+        pull_number: data.number
+      });
+      succeededs.push(data.title);
+    } catch(e) {
+      const messages = e.errors.map((error) => { return error.message });
+      const message = data.title + messages;
+      faileds.push(message);
+    }
+  }
+  message += '-- Succeeded --\n';
+  message += succeededs.join('\n');
+  message += '\n';
+  message += '-- Failed --\n';
+  message += faileds.join('\n');
   return message;
 }
 
@@ -214,5 +249,6 @@ app.message('myRepos', async ({ message, say }) => {
 
 // Handle the Lambda function event
 module.exports.handler = serverlessExpress({
-  app: expressReceiver.app
+  app: expressReceiver.app,
+  setTimeout: 7000,
 });
